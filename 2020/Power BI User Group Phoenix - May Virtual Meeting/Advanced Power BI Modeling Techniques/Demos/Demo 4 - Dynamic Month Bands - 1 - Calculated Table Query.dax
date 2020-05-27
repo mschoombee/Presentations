@@ -1,0 +1,125 @@
+﻿EVALUATE
+
+VAR 
+    MaxReportingMonths = 12
+VAR 
+    BandsToReturn = 5
+VAR
+    ReportingMonths = 
+        FILTER
+        (
+            ALL('Date'[Month], 'Date'[RelativeMonthOffset])
+        ,   'Date'[RelativeMonthOffset] < 0 && 'Date'[RelativeMonthOffset] >= (MaxReportingMonths * -1)
+        )
+VAR 
+    ReportingBandSize = 
+       ALL('Reporting Band Selection') 
+VAR 
+    ReportingMonthAndBandSize = 
+        GENERATE
+        (
+            ReportingMonths
+        ,    ReportingBandSize
+        )
+VAR
+    CalculatedReportingMonths = 
+        GENERATE
+        (
+            SELECTCOLUMNS
+            (
+                ReportingMonthAndBandSize
+            ,   "Reporting Month" 
+            ,   [Month]
+            ,   "Band Size (Months)"
+            ,   [Band Size (Months)] 
+            ,   "RelativeMonthOffset - Reporting Month"
+            ,   [RelativeMonthOffset]
+            )
+        ,   FILTER
+            (
+                ALL('Date'[Month], 'Date'[RelativeMonthOffset])
+            ,   'Date'[RelativeMonthOffset] <= ([RelativeMonthOffset - Reporting Month])
+                && 'Date'[RelativeMonthOffset] > (([Band Size (Months)] * BandsToReturn * -1) + [RelativeMonthOffset - Reporting Month])
+            )
+        )
+VAR
+    CalculatedMonthBands = 
+        GENERATE
+        (
+            CalculatedReportingMonths
+        ,   VAR 
+                ReportingMonthDateValue = 
+                    DATEVALUE("1 " & [Reporting Month])
+            VAR 
+                MonthBandOffset = 
+                    ROUNDUP
+                    (
+                        ([RelativeMonthOffset - Reporting Month] - [RelativeMonthOffset] + 1) / [Band Size (Months)]
+                    ,   0
+                    ) 
+                    * -1
+            VAR 
+                MinMonth = 
+                    DATEADD
+                    (
+                        FILTER(ALL('Date'[Date]), 'Date'[Date] = ReportingMonthDateValue)
+                    ,   (MonthBandOffset * [Band Size (Months)]) + 1
+                    ,   MONTH
+                    )
+            VAR 
+                MinMonthKey = 
+                    SELECTCOLUMNS
+                    (
+                        FILTER
+                        (
+                            ALL('Date'[Date], 'Date'[CalendarMonthKey])
+                        ,   'Date'[Date] = MinMonth
+                        )
+                    ,   "MinMonthKey"
+                    ,   [CalendarMonthKey]
+                    )               
+            VAR 
+                MaxMonth = 
+                    DATEADD
+                    (
+                        FILTER(ALL('Date'[Date]), 'Date'[Date] = ReportingMonthDateValue)
+                    ,   (MonthBandOffset * [Band Size (Months)]) + [Band Size (Months)]
+                    ,   MONTH
+                    )
+            VAR 
+                MaxMonthKey = 
+                    SELECTCOLUMNS
+                    (
+                        FILTER
+                        (
+                            ALL('Date'[Date], 'Date'[CalendarMonthKey])
+                        ,   'Date'[Date] = MaxMonth
+                        )
+                    ,   "MaxMonthKey"
+                    ,   [CalendarMonthKey]
+                    ) 
+            RETURN
+                ROW
+                (
+                    "MonthBandOffset"
+                ,   MonthBandOffset
+                ,   "Month Band"
+                ,   IF
+                    (
+                        [Band Size (Months)] = 1
+                    ,   FORMAT(MinMonth, "Mmm yyyy")
+                    ,   FORMAT(MinMonth, "Mmm yyyy") & " - " & FORMAT(MaxMonth, "Mmm yyyy")
+                    )
+                ,   "MonthBandKey" 
+                ,   CONCATENATE(MinMonthKey, MaxMonthKey)
+                )
+        )
+
+
+RETURN
+    CalculatedMonthBands 
+ORDER BY 
+	[Reporting Month],
+	[Band Size (Months)], 
+	[RelativeMonthOffset - Reporting Month], 
+	'Date'[RelativeMonthOffset] DESC
