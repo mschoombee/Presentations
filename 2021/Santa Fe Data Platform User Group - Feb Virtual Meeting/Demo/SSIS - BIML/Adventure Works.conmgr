@@ -1,0 +1,6 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<DTS:ConnectionManager xmlns:DTS="www.microsoft.com/SqlServer/Dts" DTS:ObjectName="Adventure Works" DTS:DTSID="{D7188A65-D0E1-4F56-936F-D6E3D52E4560}" DTS:refId="Package.ConnectionManagers[Adventure Works]" DTS:CreationName="OLEDB">
+  <DTS:ObjectData>
+    <DTS:ConnectionManager xmlns:DTS="www.microsoft.com/SqlServer/Dts" DTS:ConnectionString="data source=localhost;initial catalog=AdventureWorks2019;provider=SQLOLEDB.1;integrated security=SSPI;auto translate=False"></DTS:ConnectionManager>
+  </DTS:ObjectData>
+</DTS:ConnectionManager>

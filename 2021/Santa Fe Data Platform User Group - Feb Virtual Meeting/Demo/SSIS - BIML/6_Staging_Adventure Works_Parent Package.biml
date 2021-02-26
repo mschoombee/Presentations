@@ -1,0 +1,86 @@
+﻿<#@ template language="C#" tier="2" #>
+<#@ import namespace="System.Data" #>
+<#@ import namespace="System.Data.OleDb" #>
+
+<Biml xmlns="http://schemas.varigence.com/biml.xsd">
+<#@ include file="3_Connections_Include.biml"#>
+
+<#
+    //data source
+    string DataSourceLabel = "Adventure Works";
+    
+    //load sequence iterator
+    double MaxLoadSequence = 0;
+    
+    //connection objects
+    OleDbConnection conn = new OleDbConnection();
+    OleDbCommand comm = new OleDbCommand();
+    
+    OleDbDataAdapter daStagingTables = new OleDbDataAdapter();
+    OleDbDataAdapter daMaxLoadSequence = new OleDbDataAdapter();
+    
+    var dtStagingTables = new DataTable();
+    var dtMaxLoadSequence = new DataTable();
+    
+    //source to target mapping document
+    conn.ConnectionString = "Provider=Microsoft.ACE.OLEDB.12.0;Data Source=D:\\Dropbox\\Community\\_Presentations\\Regular Sessions\\BIML-UP!! How I use BIML to speed up SSIS development\\Demo\\Source to Target Mapping.xlsx;Extended Properties=\"EXCEL 12.0 XML;HDR=YES;IMEX=1\";";
+    comm.Connection = conn;
+    
+    //staging tables 
+    comm.CommandText = "select [Table], [Load Sequence] from [Staging Tables$] where [Schema] = \"" + DataSourceLabel.Replace(" ","") + "\" and [Ordinal Position] = 1";
+    
+    daStagingTables.SelectCommand = comm;
+    daStagingTables.Fill(dtStagingTables);
+    
+    //max load sequence
+    comm.CommandText = "select max([Load Sequence]) as [Max Load Sequence] from [Staging Tables$] where [Schema] = \"" + DataSourceLabel.Replace(" ","") + "\" and [Ordinal Position] = 1";
+    
+    daMaxLoadSequence.SelectCommand = comm;
+    daMaxLoadSequence.Fill(dtMaxLoadSequence);
+    
+    MaxLoadSequence = (double)dtMaxLoadSequence.Rows[0]["Max Load Sequence"];
+#>
+
+<Packages>
+    <Package Name="Staging_<#=DataSourceLabel.ToString()#>" DelayValidation="true" ProtectionLevel="DontSaveSensitive">
+        <Tasks>
+        
+            <Container Name="Sequence Container - Package" DelayValidation="true" ConstraintMode="LinearOnSuccess">
+                <Tasks>
+                <#for (int i = 1; i <= MaxLoadSequence; i++) {#>
+                    <Container Name="Sequence Container - Load Sequence <#=i.ToString()#>" ConstraintMode="Parallel">
+                        <Tasks>
+                        <#
+                            //data view for staging tables with this sequence
+                            DataView dvStagingTables = dtStagingTables.DefaultView;
+                            dvStagingTables.RowFilter = "[Load Sequence] = '" + i.ToString() + "'";
+                        #>
+                        <#foreach (DataRowView drStagingTable in dvStagingTables) {#>
+                            <ExecutePackage Name="Execute Package Task - Staging_<#=DataSourceLabel#>_<#=drStagingTable["Table"].ToString().Replace(" ","")#>" DelayValidation="true">
+                                <ExternalProjectPackage Package="Staging_<#=DataSourceLabel#>_<#=drStagingTable["Table"].ToString().Replace(" ","")#>.dtsx" />
+                            </ExecutePackage>
+                        <#};#>
+
+                        </Tasks>
+                    </Container>
+                
+                
+                <#}#>
+                </Tasks>
+            </Container>
+            
+        </Tasks>
+    </Package>
+<#
+    // staging tables
+    dtStagingTables.Dispose();
+    daStagingTables.Dispose();
+    
+    //max load sequence
+    dtMaxLoadSequence.Dispose();
+    daMaxLoadSequence.Dispose();
+#>
+</Packages>
+    
+</Biml>
+<#conn.Close();#>

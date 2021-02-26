@@ -1,0 +1,198 @@
+﻿<#@ template language="C#" tier="2" #>
+<#@ import namespace="System.Data" #>
+<#@ import namespace="System.Data.OleDb" #>
+
+<Biml xmlns="http://schemas.varigence.com/biml.xsd">
+<#@ include file="3_Connections_Include.biml"#>
+
+<#
+    //data source
+    string DataSourceLabel = "Adventure Works"; 
+    
+    // batch & commit Size
+    string ImportBatchSize = "50000";
+    
+    OleDbConnection conn = new OleDbConnection();
+    OleDbCommand comm = new OleDbCommand();
+    
+    OleDbDataAdapter daStagingDataSource = new OleDbDataAdapter();
+    OleDbDataAdapter daSourceTables = new OleDbDataAdapter();
+    OleDbDataAdapter daSourceColumns = new OleDbDataAdapter();
+    
+    var dtStagingDataSource = new DataTable();
+    
+    var dtSourceTables = new DataTable();
+    
+    var dtSourceColumns = new DataTable();
+    
+    //source to target mapping document
+    conn.ConnectionString = "Provider=Microsoft.ACE.OLEDB.12.0;Data Source=D:\\Dropbox\\Community\\_Presentations\\Regular Sessions\\BIML-UP!! How I use BIML to speed up SSIS development\\Demo\\Source to Target Mapping.xlsx;Extended Properties=\"EXCEL 12.0 XML;HDR=YES;IMEX=1\";";
+    comm.Connection = conn;
+    
+    //staging data source
+    comm.CommandText = "select [Data Source Label], [Database Name] from [Data Sources$] where [Role] = \"Staging Database\"";
+    
+    daStagingDataSource.SelectCommand = comm;
+    daStagingDataSource.Fill(dtStagingDataSource);
+    
+    string StagingDataSourceLabel = "";
+    string StagingDatabaseName = "";
+    
+    foreach (DataRow drStagingDataSource in dtStagingDataSource.Rows) {
+        StagingDataSourceLabel = drStagingDataSource["Data Source Label"].ToString();
+        StagingDatabaseName = drStagingDataSource["Database Name"].ToString();
+    };
+    
+    dtStagingDataSource.Dispose();
+    daStagingDataSource.Dispose();
+    
+    //source tables
+    comm.CommandText = "select [Data Source Label], [Schema], [Table / File], [Alias], [Filter], [Use Filter] from [Source Tables & Files$] where [Data Source Label] = \"" + DataSourceLabel.ToString() + "\" and [Create Staging SSIS Package] = \"Yes\"";
+    
+    daSourceTables.SelectCommand = comm;
+    daSourceTables.Fill(dtSourceTables);
+    
+    int ColumnCount = 0;
+    
+    //parameter array and count variables
+    string[] ParameterNames;
+    int ParameterCount;
+#>
+
+<Packages>
+<#foreach (DataRow drSourceTables in dtSourceTables.Rows) {#>
+    <# if (drSourceTables["Data Source Label"].ToString() != "" && drSourceTables["Table / File"].ToString() != "") {#>
+    <Package Name="Staging_<#=drSourceTables["Data Source Label"].ToString()#>_<#=drSourceTables["Table / File"].ToString()#>" DelayValidation="true" ProtectionLevel="DontSaveSensitive">
+        
+        <Variables>
+            <Variable Name="DataSourceLoadStartDate" DataType="DateTime">2022-01-01</Variable>
+            <Variable Name="DataSourceLoadStartDay" DataType="Int32">1</Variable>
+            <Variable Name="DataSourceLoadStartMonth" DataType="Int32">1</Variable>
+            <Variable Name="DataSourceLoadStartYear" DataType="Int32">2022</Variable>
+            <Variable Name="DataSourceLoadStartDateKey" DataType="Int32">20220101</Variable>
+        </Variables>
+            
+        <Tasks>
+            
+            <Container Name="Sequence Container - Package" DelayValidation="true" ConstraintMode="Linear">
+                
+                <Tasks>
+                    
+                    <ExecuteSQL Name="Execute SQL Task - Set Load Start Date Variables" ConnectionName="Admin DB" DelayValidation="true" ResultSet="SingleRow">
+                        <DirectInput>exec [ETL].[GetDerivedDateParameters];</DirectInput>
+                        <Results> 
+                            <Result Name="DataSourceLoadStartDate" VariableName="User.DataSourceLoadStartDate" />
+                            <Result Name="DataSourceLoadStartDay" VariableName="User.DataSourceLoadStartDay" />
+                            <Result Name="DataSourceLoadStartMonth" VariableName="User.DataSourceLoadStartMonth" />
+                            <Result Name="DataSourceLoadStartYear" VariableName="User.DataSourceLoadStartYear" />
+                            <Result Name="DataSourceLoadStartDateKey" VariableName="User.DataSourceLoadStartDateKey" />
+                        </Results>
+                    </ExecuteSQL>
+                        
+                    <ExecuteSQL Name="Execute SQL Task - <#=StagingDatabaseName#> - Truncate <#=drSourceTables["Table / File"].ToString().Replace(" ","")#>" ConnectionName="<#=StagingDataSourceLabel#>" DelayValidation="true" ResultSet="None">
+                        <DirectInput>truncate table [<#=StagingDatabaseName#>].[<#=drSourceTables["Data Source Label"].ToString().Replace(" ","")#>].[<#=drSourceTables["Table / File"].ToString().Replace(" ","")#>];</DirectInput>
+                    </ExecuteSQL>
+                        
+                    <Dataflow Name="Data Flow Task - <#=drSourceTables["Data Source Label"].ToString()#> - <#=drSourceTables["Table / File"].ToString().Replace(" ","")#>" DefaultBufferMaxRows="<#=ImportBatchSize#>" DefaultBufferSize="1048576000" DelayValidation="true">
+                        
+                        <Transformations>
+                    
+                            <OleDbSource Name="OLE DB Source - <#=drSourceTables["Data Source Label"].ToString()#> - <#=drSourceTables["Table / File"].ToString()#>" ConnectionName="<#=drSourceTables["Data Source Label"].ToString()#>" ValidateExternalMetadata="false">
+                                <#
+                                    comm.CommandText = "select [Schema], [Table / File], [Attribute], [Source Data Type], [Target Data Type] from [Source Attributes$] where [Data Source Label] = \"" + drSourceTables["Data Source Label"].ToString() + "\" and [Table / File] = \"" + drSourceTables["Table / File"].ToString() + "\" order by [Ordinal Position]";
+                                    
+                                    //clear data table
+                                    dtSourceColumns.Clear();
+                                
+                                    //populate data table
+                                    daSourceColumns.SelectCommand = comm;
+                                    daSourceColumns.Fill(dtSourceColumns);
+                                
+                                    ColumnCount = 1;
+                                    
+                                    //build query string
+                                    string SourceQuery = "select ";
+                                    
+                                    foreach (DataRow drSourceColumns in dtSourceColumns.Rows) {
+                                        if (ColumnCount == 1) {
+                                           SourceQuery += (drSourceColumns["Source Data Type"].ToString() != drSourceColumns["Target Data Type"].ToString()) ? ("\t" + "convert(" + drSourceColumns["Target Data Type"].ToString() + ", " + drSourceTables["Alias"].ToString() + ".[" + drSourceColumns["Attribute"].ToString() + "]) as [" + drSourceColumns["Attribute"].ToString().Replace(" ","_") + "]") : ("\t" + drSourceTables["Alias"].ToString() + ".[" + drSourceColumns["Attribute"].ToString() + "]");
+                                        }
+                                       else
+                                        {
+                                            SourceQuery += (drSourceColumns["Source Data Type"].ToString() != drSourceColumns["Target Data Type"].ToString()) ? ("\n,\t" + "convert(" + drSourceColumns["Target Data Type"].ToString() + ", " + drSourceTables["Alias"].ToString() + ".[" + drSourceColumns["Attribute"].ToString() + "]) as [" + drSourceColumns["Attribute"].ToString().Replace(" ","_") + "]") : ("\n,\t" + drSourceTables["Alias"].ToString() + ".[" + drSourceColumns["Attribute"].ToString() + "]");
+                                        };
+                                        
+                                        ColumnCount += 1;
+                                    };
+                                    
+                                    SourceQuery += "\n\n" + String.Concat("from ", "\t[" , drSourceTables["Schema"].ToString(), String.Concat("].[", drSourceTables["Table / File"].ToString(), "] ", drSourceTables["Alias"].ToString()));
+                                    
+                                    //initialize parameter array and count
+                                    ParameterNames = new string[] { };
+                                    ParameterCount = 0;
+                                    
+                                    //build where-clause
+                                    if (drSourceTables["Use Filter"].ToString() == "Yes" && drSourceTables["Filter"].ToString() != "") {
+                                        //initialize where-clause
+                                        string SourceQueryWhereClause = drSourceTables["Filter"].ToString();
+                                        
+                                        //find query parameter reference
+                                        while (SourceQueryWhereClause.IndexOf("@") != -1) {
+                                            ParameterCount += 1;
+                                            int ParameterStart = SourceQueryWhereClause.IndexOf("@[");
+                                            int ParameterEnd = SourceQueryWhereClause.IndexOf("]", ParameterStart);
+                                            
+                                            //resize array
+                                            Array.Resize(ref ParameterNames, ParameterCount);
+                                            
+                                            //insert parameter name into array
+                                            ParameterNames[ParameterCount - 1] = SourceQueryWhereClause.Substring(ParameterStart + 2, ParameterEnd - ParameterStart - 2);
+                                            
+                                            //replace parameter name with ?
+                                            SourceQueryWhereClause = SourceQueryWhereClause.Remove(ParameterStart, ParameterEnd - ParameterStart + 1).Insert(ParameterStart, "?");
+                                        };
+                                        
+                                        SourceQuery += "\n\n" + SourceQueryWhereClause;
+                                    };
+                                #>
+                                <DirectInput>
+<#=SourceQuery#>
+                                </DirectInput>
+                                <#if (ParameterCount > 0) {#>
+                                <Parameters>
+                                    <#for (int i = 0; i < ParameterCount; i++) {#>
+                                        <Parameter Name="Parameter<#=i.ToString()#>" VariableName="<#=ParameterNames[i].ToString()#>" />
+                                    <#};#>                         
+                                </Parameters>
+                                <#};#>
+                            </OleDbSource>
+                            
+                            <OleDbDestination Name="OLE DB Destination - <#=StagingDatabaseName#> - <#=drSourceTables["Table / File"].ToString()#>" ConnectionName="<#=StagingDataSourceLabel#>" BatchSize="<#=ImportBatchSize#>" MaximumInsertCommitSize="<#=ImportBatchSize#>">
+                                <ExternalTableOutput Table="[<#=drSourceTables["Data Source Label"].ToString().Replace(" ","")#>].[<#=drSourceTables["Table / File"].ToString().Replace(" ","_")#>]" />
+                            </OleDbDestination>
+                                
+                        </Transformations>
+                    </Dataflow>
+                    
+                </Tasks>
+                    
+            </Container>
+                
+        </Tasks>
+        
+    </Package>
+    <#}#>
+<#}#>
+<#
+    // source tables
+    dtSourceTables.Dispose();
+    daSourceTables.Dispose();
+    
+    // source columns
+    dtSourceColumns.Dispose();
+    daSourceColumns.Dispose();
+#>
+</Packages>
+    
+</Biml>
+<#conn.Close();#>

@@ -1,0 +1,6 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<DTS:ConnectionManager xmlns:DTS="www.microsoft.com/SqlServer/Dts" DTS:ObjectName="Admin DB" DTS:DTSID="{D649512A-946D-43F2-8494-C774BD6DF085}" DTS:refId="Package.ConnectionManagers[Admin DB]" DTS:CreationName="OLEDB">
+  <DTS:ObjectData>
+    <DTS:ConnectionManager xmlns:DTS="www.microsoft.com/SqlServer/Dts" DTS:ConnectionString="data source=localhost;initial catalog=BiAdmin;provider=SQLOLEDB.1;integrated security=SSPI;auto translate=False"></DTS:ConnectionManager>
+  </DTS:ObjectData>
+</DTS:ConnectionManager>
