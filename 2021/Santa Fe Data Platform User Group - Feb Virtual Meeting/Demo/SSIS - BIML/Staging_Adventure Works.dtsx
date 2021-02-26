@@ -1,0 +1,71 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<DTS:Executable DTS:CreationDate="02/26/2021 12:56:13" DTS:CreationName="Microsoft.Package" DTS:CreatorComputerName="PETER" DTS:CreatorName="MartinSchoombee" DTS:DelayValidation="True" DTS:DTSID="{D9D8A31A-2376-4C6D-995B-4C07D101F4FB}" DTS:ExecutableType="Microsoft.Package" DTS:LastModifiedProductVersion="" DTS:LocaleID="1033" DTS:ObjectName="Staging_Adventure Works" DTS:ProtectionLevel="0" DTS:refId="Package" DTS:VersionBuild="0" DTS:VersionGUID="{8D25F1AF-DF0B-4763-B7B4-7C364A291D9C}" DTS:VersionMajor="0" xmlns:DTS="www.microsoft.com/SqlServer/Dts">
+  <DTS:Property DTS:Name="PackageFormatVersion">8</DTS:Property>
+  <DTS:Executables>
+    <DTS:Executable DTS:CreationName="STOCK:SEQUENCE" DTS:DelayValidation="True" DTS:DTSID="{4A9C7FC8-7D77-4D9E-A09C-9D09E6B8ABD8}" DTS:ExecutableType="STOCK:SEQUENCE" DTS:LocaleID="-1" DTS:ObjectName="Sequence Container - Package" DTS:refId="Package\Sequence Container - Package">
+      <DTS:Executables>
+        <DTS:Executable DTS:CreationName="STOCK:SEQUENCE" DTS:DTSID="{36DCCECF-A05F-442C-8F33-F958247B5334}" DTS:ExecutableType="STOCK:SEQUENCE" DTS:LocaleID="-1" DTS:ObjectName="Sequence Container - Load Sequence 1" DTS:refId="Package\Sequence Container - Package\Sequence Container - Load Sequence 1">
+          <DTS:Executables>
+            <DTS:Executable DTS:CreationName="Microsoft.ExecutePackageTask" DTS:DelayValidation="True" DTS:DTSID="{6012BC74-18B9-43CC-A926-B8A180825FCB}" DTS:ExecutableType="Microsoft.ExecutePackageTask" DTS:LocaleID="-1" DTS:ObjectName="Execute Package Task - Staging_Adventure Works_Product" DTS:refId="Package\Sequence Container - Package\Sequence Container - Load Sequence 1\Execute Package Task - Staging_Adventure Works_Product" DTS:TaskContact="Microsoft Corporation; Microsoft SQL Server; Microsoft Corporation; All Rights Reserved;http://www.microsoft.com/sql/support/default.asp;1">
+              <DTS:ObjectData>
+                <ExecutePackageTask>
+                  <PackageName>Staging_Adventure Works_Product.dtsx</PackageName>
+                  <UseProjectReference>True</UseProjectReference>
+                </ExecutePackageTask>
+              </DTS:ObjectData>
+            </DTS:Executable>
+          </DTS:Executables>
+        </DTS:Executable>
+        <DTS:Executable DTS:CreationName="STOCK:SEQUENCE" DTS:DTSID="{D47A310A-322C-48EE-A0CE-BF579530F166}" DTS:ExecutableType="STOCK:SEQUENCE" DTS:LocaleID="-1" DTS:ObjectName="Sequence Container - Load Sequence 2" DTS:refId="Package\Sequence Container - Package\Sequence Container - Load Sequence 2">
+          <DTS:Executables>
+            <DTS:Executable DTS:CreationName="Microsoft.ExecutePackageTask" DTS:DelayValidation="True" DTS:DTSID="{373F3AAD-2882-4C36-AC5B-EB9570A2DB6C}" DTS:ExecutableType="Microsoft.ExecutePackageTask" DTS:LocaleID="-1" DTS:ObjectName="Execute Package Task - Staging_Adventure Works_ProductSubcategory" DTS:refId="Package\Sequence Container - Package\Sequence Container - Load Sequence 2\Execute Package Task - Staging_Adventure Works_ProductSubcategory" DTS:TaskContact="Microsoft Corporation; Microsoft SQL Server; Microsoft Corporation; All Rights Reserved;http://www.microsoft.com/sql/support/default.asp;1">
+              <DTS:ObjectData>
+                <ExecutePackageTask>
+                  <PackageName>Staging_Adventure Works_ProductSubcategory.dtsx</PackageName>
+                  <UseProjectReference>True</UseProjectReference>
+                </ExecutePackageTask>
+              </DTS:ObjectData>
+            </DTS:Executable>
+          </DTS:Executables>
+        </DTS:Executable>
+        <DTS:Executable DTS:CreationName="STOCK:SEQUENCE" DTS:DTSID="{3082F763-8818-4B78-B176-34E8FDF39A10}" DTS:ExecutableType="STOCK:SEQUENCE" DTS:LocaleID="-1" DTS:ObjectName="Sequence Container - Load Sequence 3" DTS:refId="Package\Sequence Container - Package\Sequence Container - Load Sequence 3">
+          <DTS:Executables>
+            <DTS:Executable DTS:CreationName="Microsoft.ExecutePackageTask" DTS:DelayValidation="True" DTS:DTSID="{2D9DE945-8358-4544-B4DD-4624B9FECA63}" DTS:ExecutableType="Microsoft.ExecutePackageTask" DTS:LocaleID="-1" DTS:ObjectName="Execute Package Task - Staging_Adventure Works_ProductCategory" DTS:refId="Package\Sequence Container - Package\Sequence Container - Load Sequence 3\Execute Package Task - Staging_Adventure Works_ProductCategory" DTS:TaskContact="Microsoft Corporation; Microsoft SQL Server; Microsoft Corporation; All Rights Reserved;http://www.microsoft.com/sql/support/default.asp;1">
+              <DTS:ObjectData>
+                <ExecutePackageTask>
+                  <PackageName>Staging_Adventure Works_ProductCategory.dtsx</PackageName>
+                  <UseProjectReference>True</UseProjectReference>
+                </ExecutePackageTask>
+              </DTS:ObjectData>
+            </DTS:Executable>
+          </DTS:Executables>
+        </DTS:Executable>
+        <DTS:Executable DTS:CreationName="STOCK:SEQUENCE" DTS:DTSID="{ACE93CBD-FED0-4714-9C93-720A362B1755}" DTS:ExecutableType="STOCK:SEQUENCE" DTS:LocaleID="-1" DTS:ObjectName="Sequence Container - Load Sequence 4" DTS:refId="Package\Sequence Container - Package\Sequence Container - Load Sequence 4">
+          <DTS:Executables>
+            <DTS:Executable DTS:CreationName="Microsoft.ExecutePackageTask" DTS:DelayValidation="True" DTS:DTSID="{B121D485-53C5-4273-A0F3-8C31F859C0A6}" DTS:ExecutableType="Microsoft.ExecutePackageTask" DTS:LocaleID="-1" DTS:ObjectName="Execute Package Task - Staging_Adventure Works_SalesOrderHeader" DTS:refId="Package\Sequence Container - Package\Sequence Container - Load Sequence 4\Execute Package Task - Staging_Adventure Works_SalesOrderHeader" DTS:TaskContact="Microsoft Corporation; Microsoft SQL Server; Microsoft Corporation; All Rights Reserved;http://www.microsoft.com/sql/support/default.asp;1">
+              <DTS:ObjectData>
+                <ExecutePackageTask>
+                  <PackageName>Staging_Adventure Works_SalesOrderHeader.dtsx</PackageName>
+                  <UseProjectReference>True</UseProjectReference>
+                </ExecutePackageTask>
+              </DTS:ObjectData>
+            </DTS:Executable>
+            <DTS:Executable DTS:CreationName="Microsoft.ExecutePackageTask" DTS:DelayValidation="True" DTS:DTSID="{A7E9A2F2-7428-4807-89EE-83BBB9161A9A}" DTS:ExecutableType="Microsoft.ExecutePackageTask" DTS:LocaleID="-1" DTS:ObjectName="Execute Package Task - Staging_Adventure Works_SalesOrderDetail" DTS:refId="Package\Sequence Container - Package\Sequence Container - Load Sequence 4\Execute Package Task - Staging_Adventure Works_SalesOrderDetail" DTS:TaskContact="Microsoft Corporation; Microsoft SQL Server; Microsoft Corporation; All Rights Reserved;http://www.microsoft.com/sql/support/default.asp;1">
+              <DTS:ObjectData>
+                <ExecutePackageTask>
+                  <PackageName>Staging_Adventure Works_SalesOrderDetail.dtsx</PackageName>
+                  <UseProjectReference>True</UseProjectReference>
+                </ExecutePackageTask>
+              </DTS:ObjectData>
+            </DTS:Executable>
+          </DTS:Executables>
+        </DTS:Executable>
+      </DTS:Executables>
+      <DTS:PrecedenceConstraints>
+        <DTS:PrecedenceConstraint DTS:CreationName="" DTS:DTSID="{6EB39578-6498-440F-85D7-1151D6520F6C}" DTS:From="Package\Sequence Container - Package\Sequence Container - Load Sequence 1" DTS:LogicalAnd="True" DTS:ObjectName="Constraint_Sequence Container - Load Sequence 1_To_Sequence Container - Load Sequence 2" DTS:refId="Package\Sequence Container - Package.PrecedenceConstraints[Constraint_Sequence Container - Load Sequence 1_To_Sequence Container - Load Sequence 2]" DTS:To="Package\Sequence Container - Package\Sequence Container - Load Sequence 2" />
+        <DTS:PrecedenceConstraint DTS:CreationName="" DTS:DTSID="{07029B22-17C9-49EB-ADBE-A4F423C93B3E}" DTS:From="Package\Sequence Container - Package\Sequence Container - Load Sequence 2" DTS:LogicalAnd="True" DTS:ObjectName="Constraint_Sequence Container - Load Sequence 2_To_Sequence Container - Load Sequence 3" DTS:refId="Package\Sequence Container - Package.PrecedenceConstraints[Constraint_Sequence Container - Load Sequence 2_To_Sequence Container - Load Sequence 3]" DTS:To="Package\Sequence Container - Package\Sequence Container - Load Sequence 3" />
+        <DTS:PrecedenceConstraint DTS:CreationName="" DTS:DTSID="{E38E821B-6E3B-463A-9966-B82BA59B32F6}" DTS:From="Package\Sequence Container - Package\Sequence Container - Load Sequence 3" DTS:LogicalAnd="True" DTS:ObjectName="Constraint_Sequence Container - Load Sequence 3_To_Sequence Container - Load Sequence 4" DTS:refId="Package\Sequence Container - Package.PrecedenceConstraints[Constraint_Sequence Container - Load Sequence 3_To_Sequence Container - Load Sequence 4]" DTS:To="Package\Sequence Container - Package\Sequence Container - Load Sequence 4" />
+      </DTS:PrecedenceConstraints>
+    </DTS:Executable>
+  </DTS:Executables>
+</DTS:Executable>
