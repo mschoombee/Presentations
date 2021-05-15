@@ -1,0 +1,107 @@
+﻿<#@ template language="C#" tier="2"#>
+<Biml xmlns="http://schemas.varigence.com/biml.xsd">
+    
+<#
+    // GLOBAL VARIABLES & OBJECTS
+    
+    // Batch & Commit Size
+    string ImportBatchSize = "50000";
+    
+    // Source Tables
+    var SourceTables = new[] {"Product", "ProductCategory", "ProductSubcategory"};
+    
+    // Staging Schema
+    string StagingSchema = "AdventureWorks";
+    
+    // Placeholder for Source Query Text
+    string SourceQueryText = "";
+    
+    // Source Query - Product
+    string SourceQuery_Product = @"select 	prd.[ProductID]
+                                    	,	convert(varchar(50), prd.[Name]) as [Name]
+                                    	,	convert(varchar(50), prd.[ProductNumber]) as [ProductNumber]
+                                    	,	convert(varchar(20), prd.[Color]) as [Color]
+                                    	,	prd.[StandardCost]
+                                    	,	convert(varchar(5), prd.[ProductLine]) as [ProductLine]
+                                    	,	convert(varchar(5), prd.[Class]) as [Class]
+                                    	,	convert(varchar(5), prd.[Style]) as [Style]
+                                    	,	prd.[ProductSubcategoryID]
+                                    	,	prd.[ModifiedDate]
+                                    
+                                    from 	[Production].[Product] prd
+                                    ;";
+    
+    // Source Query - Product Category                         
+    string SourceQuery_ProductCategory = @"select 	cat.[ProductCategoryID]
+                                            	,	convert(varchar(50), cat.[Name]) as [Name]
+                                            
+                                            from 	[Production].[ProductCategory] cat
+                                            ;";
+    
+    // Source Query - Product Sub-Category                                       
+    string SourceQuery_ProductSubcategory = @"select    subcat.[ProductSubcategoryID]
+                                                	,	subcat.[ProductCategoryID]
+                                                	,	convert(varchar(50), subcat.[Name]) as [Name]
+                                                
+                                                from 	[Production].[ProductSubcategory] subcat
+                                                ;";
+#>
+
+
+<Packages>
+    
+    <# foreach (var SourceTable in SourceTables) {#>
+    <Package Name="Staging_Adventure Works_<#=SourceTable.ToString()#>">
+        
+        <Tasks>
+                
+            <Container Name="Sequence Container - Package" DelayValidation="true" ConstraintMode="Linear">
+                <Tasks>
+                    
+                    <ExecuteSQL Name="Execute SQL Task - Adventure Works - Truncate <#=SourceTable.ToString()#>" ConnectionName="<#=RootNode.Connections["Staging DB"]#>" DelayValidation="true" ResultSet="None">
+                        <DirectInput>truncate table [<#=StagingSchema.ToString()#>].[<#=SourceTable.ToString()#>];</DirectInput>
+                    </ExecuteSQL>
+                    
+                    <Dataflow Name="Data Flow Task - Adventure Works - Product" DefaultBufferMaxRows="<#=ImportBatchSize#>" DefaultBufferSize="1048576000" DelayValidation="true">
+                        
+                        <Transformations>
+                            
+                            <OleDbSource Name="OLE DB Source - Adventure Works - Product" ConnectionName="<#=RootNode.Connections["Adventure Works"]#>" ValidateExternalMetadata="false">
+                                <DirectInput>
+                                <#
+                                switch (SourceTable.ToString())
+                                    {
+                                        case "Product":
+                                            SourceQueryText = SourceQuery_Product;
+                                            break;
+                                        case "ProductCategory":
+                                            SourceQueryText = SourceQuery_ProductCategory;
+                                            break;
+                                        case "ProductSubcategory":
+                                            SourceQueryText = SourceQuery_ProductSubcategory;
+                                            break;
+                                    }
+                                #>
+                                <#=SourceQueryText#>
+				                </DirectInput>
+                            </OleDbSource>
+            
+                            <OleDbDestination Name="OLE DB Destination - Staging DB - <#=SourceTable.ToString()#>" ConnectionName="<#=RootNode.Connections["Staging DB"]#>" BatchSize="<#=ImportBatchSize#>" MaximumInsertCommitSize="<#=ImportBatchSize#>">
+                                <ExternalTableOutput Table="[<#=StagingSchema.ToString()#>].[<#=SourceTable.ToString()#>]" />
+                            </OleDbDestination>
+                            
+                        </Transformations>
+                        
+                    </Dataflow>
+            
+                </Tasks>
+            </Container> 
+                
+        </Tasks> 
+        
+    </Package>
+    <#}#> 
+    
+</Packages>
+   
+</Biml>

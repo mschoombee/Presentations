@@ -1,0 +1,8 @@
+﻿<#@ template language="C#" tier="1"#>
+<Biml xmlns="http://schemas.varigence.com/biml.xsd">
+    <Connections>
+        <OleDbConnection Name="Adventure Works" CreateInProject="true" ConnectionString="Data Source=localhost;Initial Catalog=AdventureWorks2019;Provider=SQLOLEDB.1;Integrated Security=SSPI;Auto Translate=False;" />
+        <OleDbConnection Name="Staging DB" CreateInProject="true" ConnectionString="Data Source=localhost;Initial Catalog=Staging;Provider=SQLOLEDB.1;Integrated Security=SSPI;Auto Translate=False;" />
+        <OleDbConnection Name="Admin DB" CreateInProject="true" ConnectionString="Data Source=localhost;Initial Catalog=BiAdmin;Provider=SQLOLEDB.1;Integrated Security=SSPI;Auto Translate=False;" />
+    </Connections>
+</Biml>

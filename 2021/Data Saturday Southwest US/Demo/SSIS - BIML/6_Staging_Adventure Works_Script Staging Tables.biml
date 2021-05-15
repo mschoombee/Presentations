@@ -1,0 +1,134 @@
+﻿<#@ template language="C#" tier="2" #>
+<#@ import namespace="System.Data" #>
+<#@ import namespace="System.Data.OleDb" #>
+<#
+    //data source
+    string DataSourceLabel = "Adventure Works";
+    
+    //connection objects
+    OleDbConnection conn = new OleDbConnection();
+    OleDbCommand comm = new OleDbCommand();
+    
+    OleDbDataAdapter daDataSources = new OleDbDataAdapter();
+    OleDbDataAdapter daStagingTables = new OleDbDataAdapter();
+    
+    var dtDataSources = new DataTable();
+    var dtStagingTables = new DataTable();
+    
+    //source to target mapping document
+    conn.ConnectionString = "Provider=Microsoft.ACE.OLEDB.12.0;Data Source=D:\\Dropbox\\Community\\_Presentations\\Regular Sessions\\BIML-UP!! How I use BIML to speed up SSIS development\\Demo\\Source to Target Mapping.xlsx;Extended Properties=\"EXCEL 12.0 XML;HDR=YES;IMEX=1\";";
+    comm.Connection = conn;
+    
+    //data sources
+    comm.CommandText = "select [Data Source Label], [Database Name] from [Data Sources$] where [Role] = \"Staging Database\" and [Script Objects] = \"Yes\"";
+    daDataSources.SelectCommand = comm;
+    daDataSources.Fill(dtDataSources);
+    
+    //output text
+    string strHeader = "";
+    string strSQL = "";
+#>
+<#
+foreach (DataRow drDataSources in dtDataSources.Rows) {
+
+    strHeader = "-- " + "Create Table Scripts for Data Source " + drDataSources["Data Source Label"].ToString();
+    strHeader += "\r\n";
+    strHeader += "USE " + drDataSources["Database Name"].ToString();
+    strHeader += "\r\n";
+    strHeader += "GO";
+#>
+
+<#=strHeader#>
+
+    <#
+        //staging tables & fields
+        comm.CommandText = "select [Schema], [Table], [Attribute], [Data Type], [Nullable], [Default Value] from [Staging Tables$] where [Data Source Label] = \"" + drDataSources["Data Source Label"].ToString() + "\" order by [Schema], [Table], [Ordinal Position]";
+        
+        //clear data table
+        dtStagingTables.Clear();
+    
+        //populate data table
+        daStagingTables.SelectCommand = comm;
+        daStagingTables.Fill(dtStagingTables);
+        
+        //variables 
+        string Schema = "";
+        string StagingTable = "";
+        strSQL = ""; //reset output string
+        int RowCount = 0;
+    #>
+
+    <#
+        foreach (DataRow drStagingTables in dtStagingTables.Rows) {
+            RowCount += 1;
+        
+            if (drStagingTables["Schema"].ToString() != Schema || drStagingTables["Table"].ToString() != StagingTable) {
+                //new table, so set the new schema and table variable values
+                Schema = drStagingTables["Schema"].ToString();
+                StagingTable = drStagingTables["Table"].ToString();
+                
+                //not the first table we're scripting, so we are ending the previous create table script
+                if (RowCount != 1) {
+                    strSQL += "\r\n" + ");";
+                };
+
+                strSQL += "\r\n\r\n\r\n";
+                
+                //table header
+                strSQL += "-------------------------------------------------------------------------------";
+                strSQL += "\r\n";
+                strSQL += "-- " + "[" + drDataSources["Database Name"].ToString() + "].[" + drStagingTables["Schema"].ToString() + "].[" + drStagingTables["Table"].ToString() + "]";
+                strSQL += "\r\n";
+                strSQL += "-------------------------------------------------------------------------------";
+                strSQL += "\r\n";
+                
+                //drop statement
+                strSQL += "drop table if exists " + "[" + drDataSources["Database Name"].ToString() + "].[" + drStagingTables["Schema"].ToString() + "].[" + drStagingTables["Table"].ToString() + "];";
+                strSQL += "\r\n\r\n";
+                
+                //create statement
+                strSQL += "create table " + "[" + drDataSources["Database Name"].ToString() + "].[" + drStagingTables["Schema"].ToString() + "].[" + drStagingTables["Table"].ToString() + "]";
+                strSQL += "\r\n";
+                strSQL += "(";
+                strSQL += "\r\n";
+                
+                //field
+                strSQL += "\t[" + drStagingTables["Attribute"].ToString() + "] " + drStagingTables["Data Type"].ToString();
+            }
+            else {
+                //field
+                strSQL += "\r\n";
+                strSQL += ",\t[" + drStagingTables["Attribute"].ToString() + "] " + drStagingTables["Data Type"].ToString();
+            };
+            
+            //nullable
+            if (drStagingTables["Nullable"].ToString() == "No") {
+                strSQL += " not null";
+            };
+            
+            //default value
+            if (drStagingTables["Default Value"].ToString() != "") {
+                strSQL += " default(" + drStagingTables["Default Value"].ToString() + ")";
+            };
+        };
+    #>
+    
+    <#
+        //ending the final create table script
+        strSQL += "\r\n" + ");";
+    #>
+    
+    <#=strSQL.ToString()#>
+    
+<#};#>
+    
+<#
+    //data sources
+    dtDataSources.Dispose();
+    daDataSources.Dispose();
+
+    // staging tables & fields
+    dtStagingTables.Dispose();
+    daStagingTables.Dispose();
+#>
+<#conn.Close();#>

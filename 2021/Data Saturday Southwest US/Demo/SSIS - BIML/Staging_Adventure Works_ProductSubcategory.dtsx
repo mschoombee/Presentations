@@ -1,0 +1,146 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<DTS:Executable DTS:CreationDate="02/26/2021 12:56:03" DTS:CreationName="Microsoft.Package" DTS:CreatorComputerName="PETER" DTS:CreatorName="MartinSchoombee" DTS:DelayValidation="True" DTS:DTSID="{EDB8AF99-200B-4031-AA7B-BDB0EFB2B848}" DTS:ExecutableType="Microsoft.Package" DTS:LastModifiedProductVersion="" DTS:LocaleID="1033" DTS:ObjectName="Staging_Adventure Works_ProductSubcategory" DTS:ProtectionLevel="0" DTS:refId="Package" DTS:VersionBuild="0" DTS:VersionGUID="{A35A189B-5D4C-45E2-8CA2-94FBBFECEDC3}" DTS:VersionMajor="0" xmlns:DTS="www.microsoft.com/SqlServer/Dts">
+  <DTS:Property DTS:Name="PackageFormatVersion">8</DTS:Property>
+  <DTS:Variables>
+    <DTS:Variable DTS:CreationName="" DTS:DTSID="{31DDF7E5-807D-4C16-9CD0-BA74C6654C18}" DTS:IncludeInDebugDump="6789" DTS:Namespace="User" DTS:ObjectName="DataSourceLoadStartDate">
+      <DTS:VariableValue DTS:DataType="7">01/01/2022 00:00:00</DTS:VariableValue>
+    </DTS:Variable>
+    <DTS:Variable DTS:CreationName="" DTS:DTSID="{8813EF34-51F6-43A5-81E9-C6364DD806D1}" DTS:IncludeInDebugDump="6789" DTS:Namespace="User" DTS:ObjectName="DataSourceLoadStartDay">
+      <DTS:VariableValue DTS:DataType="3">1</DTS:VariableValue>
+    </DTS:Variable>
+    <DTS:Variable DTS:CreationName="" DTS:DTSID="{8660A0BE-9F81-4279-AF9F-79C216A35936}" DTS:IncludeInDebugDump="6789" DTS:Namespace="User" DTS:ObjectName="DataSourceLoadStartMonth">
+      <DTS:VariableValue DTS:DataType="3">1</DTS:VariableValue>
+    </DTS:Variable>
+    <DTS:Variable DTS:CreationName="" DTS:DTSID="{62995BF6-2371-42F4-9D81-0A165464C18D}" DTS:IncludeInDebugDump="6789" DTS:Namespace="User" DTS:ObjectName="DataSourceLoadStartYear">
+      <DTS:VariableValue DTS:DataType="3">2022</DTS:VariableValue>
+    </DTS:Variable>
+    <DTS:Variable DTS:CreationName="" DTS:DTSID="{C8FBFF47-C8EF-4AD8-852A-5D2288563203}" DTS:IncludeInDebugDump="6789" DTS:Namespace="User" DTS:ObjectName="DataSourceLoadStartDateKey">
+      <DTS:VariableValue DTS:DataType="3">20220101</DTS:VariableValue>
+    </DTS:Variable>
+  </DTS:Variables>
+  <DTS:Executables>
+    <DTS:Executable DTS:CreationName="STOCK:SEQUENCE" DTS:DelayValidation="True" DTS:DTSID="{7FF4A779-BEFE-422B-B51C-98EAF692F811}" DTS:ExecutableType="STOCK:SEQUENCE" DTS:LocaleID="-1" DTS:ObjectName="Sequence Container - Package" DTS:refId="Package\Sequence Container - Package">
+      <DTS:Executables>
+        <DTS:Executable DTS:CreationName="Microsoft.ExecuteSQLTask" DTS:DelayValidation="True" DTS:DTSID="{72157E3E-E2AB-4F5C-86EE-42E54EDF72E0}" DTS:ExecutableType="Microsoft.ExecuteSQLTask" DTS:LocaleID="-1" DTS:ObjectName="Execute SQL Task - Set Load Start Date Variables" DTS:refId="Package\Sequence Container - Package\Execute SQL Task - Set Load Start Date Variables" DTS:TaskContact="Execute SQL Task; Microsoft Corporation; SQL Server 2014; © 2014 Microsoft Corporation; All Rights Reserved;http://www.microsoft.com/sql/support/default.asp;1">
+          <DTS:ObjectData>
+            <SQLTask:SqlTaskData SQLTask:Connection="Admin DB" SQLTask:ResultType="ResultSetType_SingleRow" SQLTask:SqlStatementSource="exec [ETL].[GetDerivedDateParameters];" xmlns:SQLTask="www.microsoft.com/sqlserver/dts/tasks/sqltask">
+              <SQLTask:ResultBinding SQLTask:DtsVariableName="User::DataSourceLoadStartDate" SQLTask:ResultName="DataSourceLoadStartDate" />
+              <SQLTask:ResultBinding SQLTask:DtsVariableName="User::DataSourceLoadStartDay" SQLTask:ResultName="DataSourceLoadStartDay" />
+              <SQLTask:ResultBinding SQLTask:DtsVariableName="User::DataSourceLoadStartMonth" SQLTask:ResultName="DataSourceLoadStartMonth" />
+              <SQLTask:ResultBinding SQLTask:DtsVariableName="User::DataSourceLoadStartYear" SQLTask:ResultName="DataSourceLoadStartYear" />
+              <SQLTask:ResultBinding SQLTask:DtsVariableName="User::DataSourceLoadStartDateKey" SQLTask:ResultName="DataSourceLoadStartDateKey" />
+            </SQLTask:SqlTaskData>
+          </DTS:ObjectData>
+        </DTS:Executable>
+        <DTS:Executable DTS:CreationName="Microsoft.ExecuteSQLTask" DTS:DelayValidation="True" DTS:DTSID="{1BEA88C2-400B-4699-9864-BE7669739E97}" DTS:ExecutableType="Microsoft.ExecuteSQLTask" DTS:LocaleID="-1" DTS:ObjectName="Execute SQL Task - Staging - Truncate ProductSubcategory" DTS:refId="Package\Sequence Container - Package\Execute SQL Task - Staging - Truncate ProductSubcategory" DTS:TaskContact="Execute SQL Task; Microsoft Corporation; SQL Server 2014; © 2014 Microsoft Corporation; All Rights Reserved;http://www.microsoft.com/sql/support/default.asp;1">
+          <DTS:ObjectData>
+            <SQLTask:SqlTaskData SQLTask:Connection="Staging DB" SQLTask:SqlStatementSource="truncate table [Staging].[AdventureWorks].[ProductSubcategory];" xmlns:SQLTask="www.microsoft.com/sqlserver/dts/tasks/sqltask" />
+          </DTS:ObjectData>
+        </DTS:Executable>
+        <DTS:Executable DTS:CreationName="Microsoft.Pipeline" DTS:DelayValidation="True" DTS:DTSID="{78F1988B-1C7D-48D6-9B49-31430B41F10C}" DTS:ExecutableType="Microsoft.Pipeline" DTS:LocaleID="-1" DTS:ObjectName="Data Flow Task - Adventure Works - ProductSubcategory" DTS:refId="Package\Sequence Container - Package\Data Flow Task - Adventure Works - ProductSubcategory" DTS:TaskContact="Performs high-performance data extraction, transformation and loading;Microsoft Corporation; Microsoft SQL Server; (C) Microsoft Corporation; All Rights Reserved;http://www.microsoft.com/sql/support/default.asp;1">
+          <DTS:ObjectData>
+            <pipeline BLOBTempStoragePath="" bufferTempStoragePath="" defaultBufferMaxRows="50000" defaultBufferSize="1048576000" name="pipelineXml" version="1">
+              <components>
+                <component componentClassID="Microsoft.OLEDBSource" contactInfo="OLE DB Source;Microsoft Corporation; Microsoft SQL Server; (C) Microsoft Corporation; All Rights Reserved; http://www.microsoft.com/sql/support;7" name="OLE DB Source - Adventure Works - ProductSubcategory" refId="Package\Sequence Container - Package\Data Flow Task - Adventure Works - ProductSubcategory\OLE DB Source - Adventure Works - ProductSubcategory" usesDispositions="true" validateExternalMetadata="False" version="7">
+                  <connections>
+                    <connection connectionManagerID="{D7188A65-D0E1-4F56-936F-D6E3D52E4560}:external" connectionManagerRefId="Project.ConnectionManagers[Adventure Works]" description="The OLE DB runtime connection used to access the database." name="OleDbConnection" refId="Package\Sequence Container - Package\Data Flow Task - Adventure Works - ProductSubcategory\OLE DB Source - Adventure Works - ProductSubcategory.Connections[OleDbConnection]" />
+                  </connections>
+                  <outputs>
+                    <output name="Output" refId="Package\Sequence Container - Package\Data Flow Task - Adventure Works - ProductSubcategory\OLE DB Source - Adventure Works - ProductSubcategory.Outputs[Output]">
+                      <externalMetadataColumns isUsed="True">
+                        <externalMetadataColumn dataType="i4" name="ProductSubcategoryID" refId="Package\Sequence Container - Package\Data Flow Task - Adventure Works - ProductSubcategory\OLE DB Source - Adventure Works - ProductSubcategory.Outputs[Output].ExternalColumns[ProductSubcategoryID]" />
+                        <externalMetadataColumn dataType="i4" name="ProductCategoryID" refId="Package\Sequence Container - Package\Data Flow Task - Adventure Works - ProductSubcategory\OLE DB Source - Adventure Works - ProductSubcategory.Outputs[Output].ExternalColumns[ProductCategoryID]" />
+                        <externalMetadataColumn codePage="1252" dataType="str" length="50" name="Name" refId="Package\Sequence Container - Package\Data Flow Task - Adventure Works - ProductSubcategory\OLE DB Source - Adventure Works - ProductSubcategory.Outputs[Output].ExternalColumns[Name]" />
+                      </externalMetadataColumns>
+                      <outputColumns>
+                        <outputColumn dataType="i4" errorOrTruncationOperation="Conversion" errorRowDisposition="FailComponent" externalMetadataColumnId="Package\Sequence Container - Package\Data Flow Task - Adventure Works - ProductSubcategory\OLE DB Source - Adventure Works - ProductSubcategory.Outputs[Output].ExternalColumns[ProductSubcategoryID]" lineageId="Package\Sequence Container - Package\Data Flow Task - Adventure Works - ProductSubcategory\OLE DB Source - Adventure Works - ProductSubcategory.Outputs[Output].Columns[ProductSubcategoryID]" name="ProductSubcategoryID" refId="Package\Sequence Container - Package\Data Flow Task - Adventure Works - ProductSubcategory\OLE DB Source - Adventure Works - ProductSubcategory.Outputs[Output].Columns[ProductSubcategoryID]" truncationRowDisposition="FailComponent" />
+                        <outputColumn dataType="i4" errorOrTruncationOperation="Conversion" errorRowDisposition="FailComponent" externalMetadataColumnId="Package\Sequence Container - Package\Data Flow Task - Adventure Works - ProductSubcategory\OLE DB Source - Adventure Works - ProductSubcategory.Outputs[Output].ExternalColumns[ProductCategoryID]" lineageId="Package\Sequence Container - Package\Data Flow Task - Adventure Works - ProductSubcategory\OLE DB Source - Adventure Works - ProductSubcategory.Outputs[Output].Columns[ProductCategoryID]" name="ProductCategoryID" refId="Package\Sequence Container - Package\Data Flow Task - Adventure Works - ProductSubcategory\OLE DB Source - Adventure Works - ProductSubcategory.Outputs[Output].Columns[ProductCategoryID]" truncationRowDisposition="FailComponent" />
+                        <outputColumn codePage="1252" dataType="str" errorOrTruncationOperation="Conversion" errorRowDisposition="FailComponent" externalMetadataColumnId="Package\Sequence Container - Package\Data Flow Task - Adventure Works - ProductSubcategory\OLE DB Source - Adventure Works - ProductSubcategory.Outputs[Output].ExternalColumns[Name]" length="50" lineageId="Package\Sequence Container - Package\Data Flow Task - Adventure Works - ProductSubcategory\OLE DB Source - Adventure Works - ProductSubcategory.Outputs[Output].Columns[Name]" name="Name" refId="Package\Sequence Container - Package\Data Flow Task - Adventure Works - ProductSubcategory\OLE DB Source - Adventure Works - ProductSubcategory.Outputs[Output].Columns[Name]" truncationRowDisposition="FailComponent" />
+                      </outputColumns>
+                    </output>
+                    <output isErrorOut="true" name="Error" refId="Package\Sequence Container - Package\Data Flow Task - Adventure Works - ProductSubcategory\OLE DB Source - Adventure Works - ProductSubcategory.Outputs[Error]">
+                      <externalMetadataColumns />
+                      <outputColumns>
+                        <outputColumn dataType="i4" lineageId="Package\Sequence Container - Package\Data Flow Task - Adventure Works - ProductSubcategory\OLE DB Source - Adventure Works - ProductSubcategory.Outputs[Error].Columns[ProductSubcategoryID]" name="ProductSubcategoryID" refId="Package\Sequence Container - Package\Data Flow Task - Adventure Works - ProductSubcategory\OLE DB Source - Adventure Works - ProductSubcategory.Outputs[Error].Columns[ProductSubcategoryID]" />
+                        <outputColumn dataType="i4" lineageId="Package\Sequence Container - Package\Data Flow Task - Adventure Works - ProductSubcategory\OLE DB Source - Adventure Works - ProductSubcategory.Outputs[Error].Columns[ProductCategoryID]" name="ProductCategoryID" refId="Package\Sequence Container - Package\Data Flow Task - Adventure Works - ProductSubcategory\OLE DB Source - Adventure Works - ProductSubcategory.Outputs[Error].Columns[ProductCategoryID]" />
+                        <outputColumn codePage="1252" dataType="str" length="50" lineageId="Package\Sequence Container - Package\Data Flow Task - Adventure Works - ProductSubcategory\OLE DB Source - Adventure Works - ProductSubcategory.Outputs[Error].Columns[Name]" name="Name" refId="Package\Sequence Container - Package\Data Flow Task - Adventure Works - ProductSubcategory\OLE DB Source - Adventure Works - ProductSubcategory.Outputs[Error].Columns[Name]" />
+                        <outputColumn dataType="i4" lineageId="Package\Sequence Container - Package\Data Flow Task - Adventure Works - ProductSubcategory\OLE DB Source - Adventure Works - ProductSubcategory.Outputs[Error].Columns[ErrorCode]" name="ErrorCode" refId="Package\Sequence Container - Package\Data Flow Task - Adventure Works - ProductSubcategory\OLE DB Source - Adventure Works - ProductSubcategory.Outputs[Error].Columns[ErrorCode]" specialFlags="1" />
+                        <outputColumn dataType="i4" lineageId="Package\Sequence Container - Package\Data Flow Task - Adventure Works - ProductSubcategory\OLE DB Source - Adventure Works - ProductSubcategory.Outputs[Error].Columns[ErrorColumn]" name="ErrorColumn" refId="Package\Sequence Container - Package\Data Flow Task - Adventure Works - ProductSubcategory\OLE DB Source - Adventure Works - ProductSubcategory.Outputs[Error].Columns[ErrorColumn]" specialFlags="2" />
+                      </outputColumns>
+                    </output>
+                  </outputs>
+                  <properties>
+                    <property dataType="System.Int32" description="The number of seconds before a command times out.  A value of 0 indicates an infinite time-out." name="CommandTimeout">0</property>
+                    <property dataType="System.String" description="Specifies the name of the database object used to open a rowset." name="OpenRowset" />
+                    <property dataType="System.String" description="Specifies the variable that contains the name of the database object used to open a rowset." name="OpenRowsetVariable" />
+                    <property dataType="System.String" description="The SQL command to be executed." name="SqlCommand" UITypeEditor="Microsoft.DataTransformationServices.Controls.ModalMultilineStringEditor">
+select 	subcat.[ProductSubcategoryID]
+,	subcat.[ProductCategoryID]
+,	convert(varchar(50), subcat.[Name]) as [Name]
+
+from 	[Production].[ProductSubcategory] subcat
+                                </property>
+                    <property dataType="System.String" description="The variable that contains the SQL command to be executed." name="SqlCommandVariable" />
+                    <property dataType="System.Int32" description="Specifies the column code page to use when code page information is unavailable from the data source." name="DefaultCodePage">1252</property>
+                    <property dataType="System.Boolean" description="Forces the use of the DefaultCodePage property value when describing character data." name="AlwaysUseDefaultCodePage">false</property>
+                    <property dataType="System.Int32" description="Specifies the mode used to access the database." name="AccessMode" typeConverter="AccessMode">2</property>
+                    <property dataType="System.String" description="The mappings between the parameters in the SQL command and variables." name="ParameterMapping" />
+                  </properties>
+                </component>
+                <component componentClassID="Microsoft.OLEDBDestination" contactInfo="OLE DB Destination;Microsoft Corporation; Microsoft SQL Server; (C) Microsoft Corporation; All Rights Reserved; http://www.microsoft.com/sql/support;4" name="OLE DB Destination - Staging - ProductSubcategory" refId="Package\Sequence Container - Package\Data Flow Task - Adventure Works - ProductSubcategory\OLE DB Destination - Staging - ProductSubcategory" usesDispositions="true" version="4">
+                  <connections>
+                    <connection connectionManagerID="{5B0A23A8-4FA4-4CAB-A237-A8BCF4909342}:external" connectionManagerRefId="Project.ConnectionManagers[Staging DB]" description="The OLE DB runtime connection used to access the database." name="OleDbConnection" refId="Package\Sequence Container - Package\Data Flow Task - Adventure Works - ProductSubcategory\OLE DB Destination - Staging - ProductSubcategory.Connections[OleDbConnection]" />
+                  </connections>
+                  <inputs>
+                    <input errorOrTruncationOperation="Insert" errorRowDisposition="FailComponent" hasSideEffects="true" name="OLE DB Source - Adventure Works - ProductSubcategory_Output_OLE DB Destination - Staging - ProductSubcategory" refId="Package\Sequence Container - Package\Data Flow Task - Adventure Works - ProductSubcategory\OLE DB Destination - Staging - ProductSubcategory.Inputs[OLE DB Source - Adventure Works - ProductSubcategory_Output_OLE DB Destination - Staging - ProductSubcategory]">
+                      <externalMetadataColumns isUsed="True">
+                        <externalMetadataColumn dataType="i4" name="ProductSubcategoryID" refId="Package\Sequence Container - Package\Data Flow Task - Adventure Works - ProductSubcategory\OLE DB Destination - Staging - ProductSubcategory.Inputs[OLE DB Source - Adventure Works - ProductSubcategory_Output_OLE DB Destination - Staging - ProductSubcategory].ExternalColumns[ProductSubcategoryID]" />
+                        <externalMetadataColumn dataType="i4" name="ProductCategoryID" refId="Package\Sequence Container - Package\Data Flow Task - Adventure Works - ProductSubcategory\OLE DB Destination - Staging - ProductSubcategory.Inputs[OLE DB Source - Adventure Works - ProductSubcategory_Output_OLE DB Destination - Staging - ProductSubcategory].ExternalColumns[ProductCategoryID]" />
+                        <externalMetadataColumn codePage="1252" dataType="str" length="50" name="Name" refId="Package\Sequence Container - Package\Data Flow Task - Adventure Works - ProductSubcategory\OLE DB Destination - Staging - ProductSubcategory.Inputs[OLE DB Source - Adventure Works - ProductSubcategory_Output_OLE DB Destination - Staging - ProductSubcategory].ExternalColumns[Name]" />
+                        <externalMetadataColumn dataType="dbTimeStamp" name="InsertDate" refId="Package\Sequence Container - Package\Data Flow Task - Adventure Works - ProductSubcategory\OLE DB Destination - Staging - ProductSubcategory.Inputs[OLE DB Source - Adventure Works - ProductSubcategory_Output_OLE DB Destination - Staging - ProductSubcategory].ExternalColumns[InsertDate]" />
+                      </externalMetadataColumns>
+                      <inputColumns>
+                        <inputColumn cachedDataType="i4" cachedName="ProductSubcategoryID" externalMetadataColumnId="Package\Sequence Container - Package\Data Flow Task - Adventure Works - ProductSubcategory\OLE DB Destination - Staging - ProductSubcategory.Inputs[OLE DB Source - Adventure Works - ProductSubcategory_Output_OLE DB Destination - Staging - ProductSubcategory].ExternalColumns[ProductSubcategoryID]" lineageId="Package\Sequence Container - Package\Data Flow Task - Adventure Works - ProductSubcategory\OLE DB Source - Adventure Works - ProductSubcategory.Outputs[Output].Columns[ProductSubcategoryID]" name="" refId="Package\Sequence Container - Package\Data Flow Task - Adventure Works - ProductSubcategory\OLE DB Destination - Staging - ProductSubcategory.Inputs[OLE DB Source - Adventure Works - ProductSubcategory_Output_OLE DB Destination - Staging - ProductSubcategory].Columns[ProductSubcategoryID]" />
+                        <inputColumn cachedDataType="i4" cachedName="ProductCategoryID" externalMetadataColumnId="Package\Sequence Container - Package\Data Flow Task - Adventure Works - ProductSubcategory\OLE DB Destination - Staging - ProductSubcategory.Inputs[OLE DB Source - Adventure Works - ProductSubcategory_Output_OLE DB Destination - Staging - ProductSubcategory].ExternalColumns[ProductCategoryID]" lineageId="Package\Sequence Container - Package\Data Flow Task - Adventure Works - ProductSubcategory\OLE DB Source - Adventure Works - ProductSubcategory.Outputs[Output].Columns[ProductCategoryID]" name="" refId="Package\Sequence Container - Package\Data Flow Task - Adventure Works - ProductSubcategory\OLE DB Destination - Staging - ProductSubcategory.Inputs[OLE DB Source - Adventure Works - ProductSubcategory_Output_OLE DB Destination - Staging - ProductSubcategory].Columns[ProductCategoryID]" />
+                        <inputColumn cachedCodepage="1252" cachedDataType="str" cachedLength="50" cachedName="Name" externalMetadataColumnId="Package\Sequence Container - Package\Data Flow Task - Adventure Works - ProductSubcategory\OLE DB Destination - Staging - ProductSubcategory.Inputs[OLE DB Source - Adventure Works - ProductSubcategory_Output_OLE DB Destination - Staging - ProductSubcategory].ExternalColumns[Name]" lineageId="Package\Sequence Container - Package\Data Flow Task - Adventure Works - ProductSubcategory\OLE DB Source - Adventure Works - ProductSubcategory.Outputs[Output].Columns[Name]" name="" refId="Package\Sequence Container - Package\Data Flow Task - Adventure Works - ProductSubcategory\OLE DB Destination - Staging - ProductSubcategory.Inputs[OLE DB Source - Adventure Works - ProductSubcategory_Output_OLE DB Destination - Staging - ProductSubcategory].Columns[Name]" />
+                      </inputColumns>
+                    </input>
+                  </inputs>
+                  <outputs>
+                    <output exclusionGroup="1" isErrorOut="true" name="Error" refId="Package\Sequence Container - Package\Data Flow Task - Adventure Works - ProductSubcategory\OLE DB Destination - Staging - ProductSubcategory.Outputs[Error]" synchronousInputId="Package\Sequence Container - Package\Data Flow Task - Adventure Works - ProductSubcategory\OLE DB Destination - Staging - ProductSubcategory.Inputs[OLE DB Source - Adventure Works - ProductSubcategory_Output_OLE DB Destination - Staging - ProductSubcategory]">
+                      <externalMetadataColumns />
+                      <outputColumns>
+                        <outputColumn dataType="i4" lineageId="Package\Sequence Container - Package\Data Flow Task - Adventure Works - ProductSubcategory\OLE DB Destination - Staging - ProductSubcategory.Outputs[Error].Columns[ErrorCode]" name="ErrorCode" refId="Package\Sequence Container - Package\Data Flow Task - Adventure Works - ProductSubcategory\OLE DB Destination - Staging - ProductSubcategory.Outputs[Error].Columns[ErrorCode]" specialFlags="1" />
+                        <outputColumn dataType="i4" lineageId="Package\Sequence Container - Package\Data Flow Task - Adventure Works - ProductSubcategory\OLE DB Destination - Staging - ProductSubcategory.Outputs[Error].Columns[ErrorColumn]" name="ErrorColumn" refId="Package\Sequence Container - Package\Data Flow Task - Adventure Works - ProductSubcategory\OLE DB Destination - Staging - ProductSubcategory.Outputs[Error].Columns[ErrorColumn]" specialFlags="2" />
+                      </outputColumns>
+                    </output>
+                  </outputs>
+                  <properties>
+                    <property dataType="System.Int32" description="The number of seconds before a command times out.  A value of 0 indicates an infinite time-out." name="CommandTimeout">0</property>
+                    <property dataType="System.String" description="Specifies the name of the database object used to open a rowset." name="OpenRowset">[AdventureWorks].[ProductSubcategory]</property>
+                    <property dataType="System.String" description="Specifies the variable that contains the name of the database object used to open a rowset." name="OpenRowsetVariable" />
+                    <property dataType="System.String" description="The SQL command to be executed." name="SqlCommand" UITypeEditor="Microsoft.DataTransformationServices.Controls.ModalMultilineStringEditor" />
+                    <property dataType="System.Int32" description="Specifies the column code page to use when code page information is unavailable from the data source." name="DefaultCodePage">1252</property>
+                    <property dataType="System.Boolean" description="Forces the use of the DefaultCodePage property value when describing character data." name="AlwaysUseDefaultCodePage">false</property>
+                    <property dataType="System.Int32" description="Specifies the mode used to access the database." name="AccessMode">3</property>
+                    <property dataType="System.Boolean" description="Indicates whether the values supplied for identity columns will be copied to the destination. If false, values for identity columns will be auto-generated at the destination. Applies only if fast load is turned on." name="FastLoadKeepIdentity">false</property>
+                    <property dataType="System.Boolean" description="Indicates whether the columns containing null will have null inserted in the destination. If false, columns containing null will have their default values inserted at the destination. Applies only if fast load is turned on." name="FastLoadKeepNulls">false</property>
+                    <property dataType="System.String" description="Specifies options to be used with fast load.  Applies only if fast load is turned on." name="FastLoadOptions">TABLOCK,CHECK_CONSTRAINTS,ROWS_PER_BATCH = 50000</property>
+                    <property dataType="System.Int32" description="Specifies when commits are issued during data insertion.  A value of 0 specifies that one commit will be issued at the end of data insertion.  Applies only if fast load is turned on." name="FastLoadMaxInsertCommitSize">50000</property>
+                  </properties>
+                </component>
+              </components>
+              <paths>
+                <path endId="Package\Sequence Container - Package\Data Flow Task - Adventure Works - ProductSubcategory\OLE DB Destination - Staging - ProductSubcategory.Inputs[OLE DB Source - Adventure Works - ProductSubcategory_Output_OLE DB Destination - Staging - ProductSubcategory]" name="OLE DB Source - Adventure Works - ProductSubcategory_Output_OLE DB Destination - Staging - ProductSubcategory" refId="Package\Sequence Container - Package\Data Flow Task - Adventure Works - ProductSubcategory.Paths[OLE DB Source - Adventure Works - ProductSubcategory_Output_OLE DB Destination - Staging - ProductSubcategory]" startId="Package\Sequence Container - Package\Data Flow Task - Adventure Works - ProductSubcategory\OLE DB Source - Adventure Works - ProductSubcategory.Outputs[Output]" />
+              </paths>
+            </pipeline>
+          </DTS:ObjectData>
+        </DTS:Executable>
+      </DTS:Executables>
+      <DTS:PrecedenceConstraints>
+        <DTS:PrecedenceConstraint DTS:CreationName="" DTS:DTSID="{956BA015-59C2-4EDD-A2E5-1A67F867AB80}" DTS:From="Package\Sequence Container - Package\Execute SQL Task - Set Load Start Date Variables" DTS:LogicalAnd="True" DTS:ObjectName="Constraint_Execute SQL Task - Set Load Start Date Variables_To_Execute SQL Task - Staging - Truncate ProductSubcategory" DTS:refId="Package\Sequence Container - Package.PrecedenceConstraints[Constraint_Execute SQL Task - Set Load Start Date Variables_To_Execute SQL Task - Staging - Truncate ProductSubcategory]" DTS:To="Package\Sequence Container - Package\Execute SQL Task - Staging - Truncate ProductSubcategory" />
+        <DTS:PrecedenceConstraint DTS:CreationName="" DTS:DTSID="{CDC8D5FF-8EA1-46B1-8C3E-300208893D8D}" DTS:From="Package\Sequence Container - Package\Execute SQL Task - Staging - Truncate ProductSubcategory" DTS:LogicalAnd="True" DTS:ObjectName="Constraint_Execute SQL Task - Staging - Truncate ProductSubcategory_To_Data Flow Task - Adventure Works - ProductSubcategory" DTS:refId="Package\Sequence Container - Package.PrecedenceConstraints[Constraint_Execute SQL Task - Staging - Truncate ProductSubcategory_To_Data Flow Task - Adventure Works - ProductSubcategory]" DTS:To="Package\Sequence Container - Package\Data Flow Task - Adventure Works - ProductSubcategory" />
+      </DTS:PrecedenceConstraints>
+    </DTS:Executable>
+  </DTS:Executables>
+</DTS:Executable>
