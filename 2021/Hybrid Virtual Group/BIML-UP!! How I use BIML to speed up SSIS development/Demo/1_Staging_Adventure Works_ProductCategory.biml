@@ -1,0 +1,50 @@
+﻿<#@ template language="C#" tier="2"#>
+<Biml xmlns="http://schemas.varigence.com/biml.xsd">
+    <Connections>
+        <OleDbConnection Name="Adventure Works" CreateInProject="true" ConnectionString="Data Source=localhost;Initial Catalog=AdventureWorks2019;Provider=SQLOLEDB.1;Integrated Security=SSPI;Auto Translate=False;" />
+        <OleDbConnection Name="Staging DB" CreateInProject="true" ConnectionString="Data Source=localhost;Initial Catalog=Staging;Provider=SQLOLEDB.1;Integrated Security=SSPI;Auto Translate=False;" />
+        <OleDbConnection Name="Admin DB" CreateInProject="true" ConnectionString="Data Source=localhost;Initial Catalog=BiAdmin;Provider=SQLOLEDB.1;Integrated Security=SSPI;Auto Translate=False;" />
+    </Connections>
+    
+    <Packages>
+        
+        <Package Name="Staging_Adventure Works_ProductCategory" DelayValidation="true" ProtectionLevel="DontSaveSensitive">
+            <Tasks>
+                
+                <Container Name="Sequence Container - Package" DelayValidation="true" ConstraintMode="Linear">
+                    <Tasks>
+                        
+                        <ExecuteSQL Name="Execute SQL Task - Adventure Works - Truncate ProductCategory" ConnectionName="Staging DB" DelayValidation="true" ResultSet="None">
+                            <DirectInput>truncate table [AdventureWorks].[ProductCategory];</DirectInput>
+                        </ExecuteSQL>
+                        
+                        <Dataflow Name="Data Flow Task - Adventure Works - ProductCategory" DefaultBufferMaxRows="50000" DefaultBufferSize="1048576000" DelayValidation="true">
+                            
+                            <Transformations>
+                                
+                                <OleDbSource Name="OLE DB Source - Adventure Works - ProductCategory" ConnectionName="Adventure Works" ValidateExternalMetadata="false">
+                                    <DirectInput>
+                                        select 	cat.[ProductCategoryID]
+                                        	,	convert(varchar(50), cat.[Name]) as [Name]
+                                        
+                                        from 	[Production].[ProductCategory] cat
+                                        ;
+					                </DirectInput>
+                                </OleDbSource>
+            
+                                <OleDbDestination Name="OLE DB Destination - Staging DB - ProductCategory" ConnectionName="Staging DB" BatchSize="50000" MaximumInsertCommitSize="50000">
+                                    <ExternalTableOutput Table="[AdventureWorks].[ProductCategory]" />
+                                </OleDbDestination>
+                                    
+                            </Transformations>
+                            
+                        </Dataflow>
+                
+                    </Tasks>
+                </Container> 
+                
+            </Tasks> 
+        </Package>
+            
+    </Packages>
+</Biml>

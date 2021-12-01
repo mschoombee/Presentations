@@ -1,0 +1,55 @@
+﻿<#@ template language="C#" tier="2"#>
+<Biml xmlns="http://schemas.varigence.com/biml.xsd">
+    
+    <#@ include file="3_Connections_Include.biml"#>
+    
+    <Packages>
+        
+        <Package Name="Staging_Adventure Works_Product" DelayValidation="true" ProtectionLevel="DontSaveSensitive">
+            <Tasks>
+                
+                <Container Name="Sequence Container - Package" DelayValidation="true" ConstraintMode="Linear">
+                    <Tasks>
+                        
+                        <ExecuteSQL Name="Execute SQL Task - Adventure Works - Truncate Product" ConnectionName="Staging DB" DelayValidation="true" ResultSet="None">
+                            <DirectInput>truncate table [AdventureWorks].[Product];</DirectInput>
+                        </ExecuteSQL>
+                        
+                        <Dataflow Name="Data Flow Task - Adventure Works - Product" DefaultBufferMaxRows="50000" DefaultBufferSize="1048576000" DelayValidation="true">
+                            
+                            <Transformations>
+                                
+                                <OleDbSource Name="OLE DB Source - Adventure Works - Product" ConnectionName="Adventure Works" ValidateExternalMetadata="false">
+                                    <DirectInput>
+                                        select 	prd.[ProductID]
+                                        	,	convert(varchar(50), prd.[Name]) as [Name]
+                                        	,	convert(varchar(50), prd.[ProductNumber]) as [ProductNumber]
+                                        	,	convert(varchar(20), prd.[Color]) as [Color]
+                                        	,	prd.[StandardCost]
+                                        	,	convert(varchar(5), prd.[ProductLine]) as [ProductLine]
+                                        	,	convert(varchar(5), prd.[Class]) as [Class]
+                                        	,	convert(varchar(5), prd.[Style]) as [Style]
+                                        	,	prd.[ProductSubcategoryID]
+                                        	,	prd.[ModifiedDate]
+                                        
+                                        from 	[Production].[Product] prd
+                                        ;
+					                </DirectInput>
+                                </OleDbSource>
+                
+                                <OleDbDestination Name="OLE DB Destination - Staging DB - Product" ConnectionName="Staging DB" BatchSize="50000" MaximumInsertCommitSize="50000">
+                                    <ExternalTableOutput Table="[AdventureWorks].[Product]" />
+                                </OleDbDestination>
+                                
+                            </Transformations>
+                            
+                        </Dataflow>
+                
+                    </Tasks>
+                </Container> 
+                
+            </Tasks> 
+        </Package>
+            
+    </Packages>
+</Biml>
